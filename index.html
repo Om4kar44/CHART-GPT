@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glowing Login Form</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;300;400&display=swap" rel="stylesheet">
+
+    <!--new-->
+    
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+        /* Global Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            height: 100vh;
+            background: radial-gradient(circle at center, rgba(14, 19, 29, 0.9), rgba(0, 0, 0, 0.9));
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* Navigation Bar Styling */
+        .navbar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.75);
+            padding: 20px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
+            z-index: 100;
+            font-size: 1.2rem;
+        }
+
+        .navbar ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+        }
+
+        .navbar ul li {
+            margin: 0 20px;
+        }
+
+        .navbar ul li a {
+            text-decoration: none;
+            color: white;
+            transition: color 0.3s ease;
+        }
+
+        .navbar ul li a:hover {
+            color: #32cd32;
+        }
+
+        /* Login Form Styling */
+        .login-form {
+            background: linear-gradient(145deg, #1d1d1d, #2b2b2b); /* Darker form background with a subtle gradient */
+            backdrop-filter: blur(10px);
+            padding: 3rem;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.7);
+            width: 400px;
+            text-align: center;
+            z-index: 10;
+            animation: fadeIn 1s ease-out forwards;
+            transform: translateY(-20px) translateX(20px); /* Shifted right by 20px */
+            transition: transform 0.4s ease-in-out;
+        }
+
+        .login-form:hover {
+            transform: translateY(0) translateX(20px); /* Hover effect keeps the shift */
+        }
+
+        .login-form h2 {
+            color: white;
+            margin-bottom: 20px;
+            font-size: 2.2rem;
+            letter-spacing: 1px;
+        }
+
+        .login-form label {
+            display: block;
+            color: #b0b0b0; /* Lighter color for better contrast */
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .login-form input {
+            width: 100%;
+            padding: 15px;
+            margin: 12px 0;
+            border-radius: 8px;
+            border: 2px solid transparent;
+            outline: none;
+            background-color: #444;
+            color: white;
+            font-size: 1.2rem;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .login-form input:focus {
+            border-color: #32cd32;
+            box-shadow: 0 0 5px 2px rgba(50, 205, 50, 1); /* Thinner, brighter green glow */
+            background-color: #333;
+        }
+
+        .login-form button {
+            padding: 15px 20px;
+            border: none;
+            background-color: #32cd32;
+            color: white;
+            font-size: 1.4rem;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+
+        .login-form button:hover {
+            background-color: #28a745;
+            box-shadow: 0 0 10px 3px rgba(50, 205, 50, 1); /* Thinner, brighter green glow on hover */
+        }
+
+        .login-form button.danger {
+            background-color: #ff4c4c;
+            animation: pulse 2s infinite;
+        }
+
+        .login-form button.danger:hover {
+            background-color: #ff1a1a;
+            box-shadow: 0 0 10px 3px rgba(255, 0, 0, 1); /* Thinner, brighter red glow */
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 0 10px 3px rgba(255, 0, 0, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 15px 5px rgba(255, 0, 0, 1);
+            }
+        }
+
+        /* Floating Lights */
+        .light {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.7);
+            box-shadow: 0 0 25px 3px rgba(255, 255, 255, 0.7);
+            opacity: 0;
+            animation: floatUp 6s infinite linear;
+        }
+
+        .x1 { animation-duration: 4s; left: 10%; }
+        .x2 { animation-duration: 5.5s; left: 20%; }
+        .x3 { animation-duration: 6s; left: 30%; }
+        .x4 { animation-duration: 7s; left: 50%; }
+        .x5 { animation-duration: 5.2s; left: 70%; }
+        .x6 { animation-duration: 4.7s; left: 80%; }
+        .x7 { animation-duration: 6.5s; left: 90%; }
+
+        /* Keyframes for Floating Lights */
+        @keyframes floatUp {
+            0% { top: 100vh; opacity: 0; }
+            25% { opacity: 0.6; }
+            50% { top: 0vh; opacity: 1; }
+            75% { opacity: 0.6; }
+            100% { top: -100vh; opacity: 0; }
+        }
+
+        /* Fade-in for the form */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation Bar -->
+    <div class="navbar">
+        <ul>
+            <li><a href="h2.html">Home</a></li>
+            <li><a href="data8.html">AI1</a></li>
+            <li><a href="data7.html">AI2</a></li>
+         
+        </ul>
+    </div>
+
+    <!-- Login Form -->
+    <div class="login-form">
+        <h2>Login</h2>
+        <form>
+            <label for="username"><h3>Username</h3></label>
+            <input type="text" id="username" name="username" required>
+            <label for="password"><h3>Password</h3></label>
+            <input type="password" id="password" name="password" required>
+          
+            <div class="google-button" id="g_id_signin"></div>
+            
+            <script src="1.js"></script>
+        </form>
+        <br><br>
+        
+        <button class="login-form" onclick="window.location.href='/h2.html';">Sign-in</button>
+    </div><br><br>
+    
+
+
+    <!-- Floating Lights -->
+    <div class="light x1"></div>
+    <div class="light x2"></div>
+    <div class="light x3"></div>
+    <div class="light x4"></div>
+    <div class="light x5"></div>
+    <div class="light x6"></div>
+    <div class="light x7"></div></body><br><br>
+    </body>
+    </html>

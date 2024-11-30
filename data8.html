@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Chart Generator with Advanced Data Analysis</title>
+    <link rel="stylesheet" href="data.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+  
+    <div class="navbar">
+        <ul>
+            <li><a href="h2.html">Home</a></li>
+            <li><a href="data8.html">AI1</a></li>
+            <li><a href="data7.html">AI2</a></li>
+           
+        </ul>
+    
+    <div class="container">
+        <h1>Interactive Chart Generator with Data Analysis</h1>
+
+        <!-- User Input for Chart Prompt -->
+        <div class="input-section">
+            <label for="chart-prompt">Enter Chart Prompt (e.g., "Bar chart for sales data"): </label>
+            <input type="text" id="chart-prompt" value="Pie chart for 2024 US Election Voter Percentages" />
+            <button class="btn" onclick="showCustomizationOptions()">Generate Chart</button>
+        </div>
+
+        <!-- Chart Customization Options -->
+        <div id="chart-options" class="section" style="display:none;">
+            <h3>Customize Your Chart</h3>
+
+            <label for="chart-title">Chart Title:</label>
+            <input type="text" id="chart-title" value="2024 US Election Voter Percentages">
+
+            <label for="chart-color">Chart Color (Primary):</label>
+            <input type="color" id="chart-color" value="#4CAF50">
+
+            <label for="dot-color">Dot Color (Bar/Line/Scatter):</label>
+            <input type="color" id="dot-color" value="#FF5733">
+
+            <label for="chart-type">Select Chart Type:</label>
+            <select id="chart-type">
+                <option value="pie">Pie</option>
+                <option value="bar">Bar</option>
+                <option value="line">Line</option>
+                <option value="doughnut">Doughnut</option>
+                <option value="radar">Radar</option>
+                <option value="scatter">Scatter</option>
+            </select>
+
+            <label for="x-axis-label">X-Axis Label:</label>
+            <input type="text" id="x-axis-label" value="Party">
+
+            <label for="y-axis-label">Y-Axis Label:</label>
+            <input type="text" id="y-axis-label" value="Percentage">
+
+            <label for="font-size">Font Size for Labels:</label>
+            <input type="number" id="font-size" value="16">
+
+            <label for="grid-line-style">Grid Line Style:</label>
+            <select id="grid-line-style">
+                <option value="solid">Solid</option>
+                <option value="dotted">Dotted</option>
+                <option value="dashed">Dashed</option>
+            </select>
+
+            <label for="legend-toggle">Show Legend:</label>
+            <input type="checkbox" id="legend-toggle" checked>
+
+            <label for="grid-toggle">Show Grid Lines:</label>
+            <input type="checkbox" id="grid-toggle" checked>
+
+            <button class="btn" onclick="generateChart()">Generate Chart</button>
+        </div>
+
+        <!-- Data Analysis Output -->
+        <div id="data-analysis" class="section" style="display:none;">
+            <h3>Data Insights and Analysis</h3>
+            <p id="average">Average: --</p>
+            <p id="max-value">Max Value: --</p>
+            <p id="min-value">Min Value: --</p>
+            <p id="std-deviation">Standard Deviation: --</p>
+            <p id="growth-rate">Growth Rate: --</p>
+            <p id="moving-average">Moving Average: --</p>
+            <p id="trend">Trend: --</p>
+            <p id="percent-change">Percent Change: --</p>
+            <p id="outliers">Outliers: --</p>
+        </div>
+
+        <!-- Canvas for Chart Rendering -->
+        <canvas id="myChart"></canvas>
+        <button class="btn download-btn" onclick="downloadChart()">Download Chart</button>
+        <button class="btn" onclick="regenerateLastChart()">Show Last Chart</button>
+    </div>
+<style>
+    .navbar {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background-color: rgba(0, 0, 0, 0.75);
+        padding: 10px 0;  /* Reduced padding for better fit */
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
+        z-index: 100;
+        font-size: 1.2rem;
+        display: flex;  /* Flexbox enables horizontal layout */
+        justify-content: center;  /* Centers the navbar items */
+    }
+    
+    .navbar ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;  /* Use flexbox to arrange items horizontally */
+    }
+    
+    .navbar li {
+        margin-right: 20px;  /* Space between list items */
+    }
+    
+    .navbar a {
+        color: white;
+        text-decoration: none;
+        font-size: 1.2rem;
+    }
+    
+    .navbar a:hover {
+        color: #ddd;  /* Add a hover effect */
+    }
+    
+</style>
+    <script>
+        let lastChartConfig = null; // Variable to store the last chart's configuration
+        let currentChart = null; // Variable to hold the current Chart instance
+
+        // Function to generate the chart
+        function generateChart() {
+            // Get chart customization options
+            const chartTitle = document.getElementById('chart-title').value || '2024 US Election Voter Percentages';
+            const chartColor = document.getElementById('chart-color').value || '#4CAF50';
+            const dotColor = document.getElementById('dot-color').value || '#FF5733';
+            const chartType = document.getElementById('chart-type').value || 'pie';
+            const showLegend = document.getElementById('legend-toggle').checked;
+            const xAxisLabel = document.getElementById('x-axis-label').value || 'Party';
+            const yAxisLabel = document.getElementById('y-axis-label').value || 'Percentage';
+            const fontSize = document.getElementById('font-size').value || 16;
+            const gridLineStyle = document.getElementById('grid-line-style').value || 'solid';
+            const showGridLines = document.getElementById('grid-toggle').checked;
+
+            // Data for the chart
+           // Data for the chart
+const data = {
+    labels: ['Democratic', 'Republican', 'Forward', 'Green party'],
+    datasets: [{
+        label: chartTitle,
+        data: [52, 48.44, 1.18, 0.257], // Percentage for Democratic, Republican, Forward, and Green parties
+        backgroundColor: [
+            '#4CAF50',  // Color for Democratic
+            '#FF5733',  // Color for Republican
+            '#FFC107',  // Color for Forward
+            '#9C27B0'   // Color for Green party
+        ], // Colors for each party in the chart
+        borderColor: ['#ffffff', '#ffffff', '#ffffff', '#ffffff'], // Border color for each section
+        borderWidth: 1,
+        // For scatter, line, and bar charts, we use the dot color
+        pointBackgroundColor: chartType === 'scatter' || chartType === 'line' || chartType === 'bar' ? [dotColor, dotColor, dotColor, dotColor] : [],
+    }]
+};
+
+
+            // Configuration options
+            const options = {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: showLegend,
+                        position: 'top'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                return tooltipItem.label + ': ' + tooltipItem.raw + '%';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        title: {
+                            display: true,
+                            text: yAxisLabel,
+                            font: {
+                                size: fontSize
+                            }
+                        },
+                        grid: {
+                            borderColor: gridLineStyle === 'solid' ? '#000' : '#ddd',
+                            borderDash: gridLineStyle === 'dotted' ? [3, 3] : gridLineStyle === 'dashed' ? [5, 5] : [],
+                            display: showGridLines
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: xAxisLabel,
+                            font: {
+                                size: fontSize
+                            }
+                        }
+                    }
+                }
+            };
+
+            // Save the last chart configuration
+            lastChartConfig = { type: chartType, data, options };
+
+            // Destroy the existing chart instance if it exists
+            if (currentChart) {
+                currentChart.destroy();
+            }
+
+            // Create the chart
+            const ctx = document.getElementById('myChart').getContext('2d');
+            currentChart = new Chart(ctx, {
+                type: chartType,
+                data: data,
+                options: options
+            });
+        }
+
+        // Function to regenerate the last chart
+        function regenerateLastChart() {
+            if (!lastChartConfig) {
+                alert('No previous chart found!');
+                return;
+            }
+
+            // Destroy the existing chart instance if it exists
+            if (currentChart) {
+                currentChart.destroy();
+            }
+
+            // Create the chart using the last saved configuration
+            const ctx = document.getElementById('myChart').getContext('2d');
+            currentChart = new Chart(ctx, lastChartConfig);
+        }
+
+        // Function to show customization options
+        function showCustomizationOptions() {
+            document.getElementById('chart-options').style.display = 'block';
+        }
+
+        // Function to download chart as an image
+        function downloadChart() {
+            const canvas = document.getElementById('myChart');
+            const imageUrl = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.href = imageUrl;
+            link.download = 'chart.png';
+            link.click();
+        }
+    </script>
+</body>
+
+</html>
